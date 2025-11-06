@@ -6,7 +6,7 @@ kind: ConfigMap
 metadata:
   name: frontend-config
 data:
-  greeting: "Hi I am Clarence"
+  greeting: "Hello world"
 
 ---
 apiVersion: v1
@@ -15,7 +15,7 @@ metadata:
   name: backend-secret
 type: Opaque
 stringData:
-  password: "Clarence"
+  password: "Clarence tiang"
 
 # ==============================
 # Backend Deployment + Service
