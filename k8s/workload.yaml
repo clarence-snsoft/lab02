@@ -19,7 +19,7 @@ spec:
       project: default
       source:
         repoURL: "https://github.com/clarence-snsoft/lab02.git"
-        path: "."
+        path: "k8s/"
         targetRevision: "main"
         directory:
           recurse: true
