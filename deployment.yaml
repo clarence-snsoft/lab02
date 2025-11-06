@@ -1,0 +1,126 @@
+# ==============================
+# ConfigMap & Secret
+# ==============================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  greeting: "Hi I am Clarence"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-secret
+type: Opaque
+stringData:
+  password: "Clarence"
+
+# ==============================
+# Backend Deployment + Service
+# ==============================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: SECRET_PASSWORD 
+              valueFrom:        #value: "super-secret" if not using secret
+                secretKeyRef:
+                  name: backend-secret
+                  key: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
+
+# ==============================
+# Frontend Deployment + Service
+# ==============================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3001
+          env:
+            - name: BACKEND_URL
+              value: "http://backend-service:3000"
+            - name: GREETING_TEXT
+              valueFrom:        # value: "Hello from Frontend via K8s" if not using ConfigMap
+                configMapKeyRef:
+                  name: frontend-config
+                  key: greeting
+          # -------------------------
+          # Readiness probe (消除 downtime)
+          readinessProbe:
+            httpGet:
+              path: "/"      # 前端首頁
+              port: 3001
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            failureThreshold: 3
+          # Liveness probe (檢查 Pod 是否存活)
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 3001
+      targetPort: 3001
+      nodePort: 30010   # 可固定，也可刪掉讓K8s自動分配
+  type: NodePort
