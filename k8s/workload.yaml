@@ -19,8 +19,8 @@ spec:
       project: default
       source:
         repoURL: "https://github.com/clarence-snsoft/lab02.git"
-        path: "k8s/"
-        targetRevision: "HEAD"
+        path: "k8s/workload.yaml"
+        targetRevision: "main"
         directory:
           recurse: true
       destination:
