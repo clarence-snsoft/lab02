@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: orders-service
+  name: order-service
   namespace: argocd
 spec:
   syncPolicy:
