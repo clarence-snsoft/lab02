@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: lab02-1
+  name: name1
   namespace: argocd
 spec:
   syncPolicy:
@@ -10,7 +10,7 @@ spec:
     - clusters: {}
   template:
     metadata:
-      name: lab02-2
+      name: name2
       finalizers:
         # This finalizer is for demo purposes, in production remove apps using argocd CLI "argocd app delete workload --cascade"
         # When you invoke argocd app delete with --cascade, the finalizer is added automatically.
@@ -20,7 +20,7 @@ spec:
       source:
         repoURL: "https://github.com/clarence-snsoft/lab02.git"
         path: "k8s/"
-        targetRevision: "main"
+        targetRevision: "HEAD"
         directory:
           recurse: true
       destination:
